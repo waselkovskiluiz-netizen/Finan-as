@@ -17,6 +17,7 @@
         <a class="nav-link active" href="#inicio"><span class="nav-icon">▦</span> Visão geral</a>
         <a class="nav-link" href="#transacoes"><span class="nav-icon">↕</span> Transações</a>
         <a class="nav-link" href="#contas-fixas"><span class="nav-icon">◷</span> Contas fixas</a>
+        <a class="nav-link" href="#dividas"><span class="nav-icon">↗</span> Dívidas</a>
       </nav>
       <div class="sidebar-note"><span class="note-icon">✦</span><strong>Um passo de cada vez.</strong><p>Pequenas escolhas hoje fazem diferença amanhã.</p></div>
       <div class="sidebar-footer"><span class="status-dot"></span> Seus dados ficam só neste dispositivo</div>
@@ -58,6 +59,10 @@
       <section class="panel bills-panel" id="contas-fixas"><div class="panel-heading"><div><div class="section-kicker">DESPESAS RECORRENTES</div><h2>Contas fixas</h2><p class="section-description">Organize os compromissos que se repetem todo mês.</p></div><button class="button button-secondary" id="open-bill"><span aria-hidden="true">＋</span> Nova conta</button></div>
         <div class="bills-list" id="bills-list"></div><div class="empty-inline" id="bills-empty">Nenhuma conta fixa cadastrada. Adicione aluguel, internet ou outras despesas recorrentes.</div>
       </section>
+      <section class="panel debts-panel" id="dividas"><div class="panel-heading"><div><div class="section-kicker">CONTROLE DE DÍVIDAS</div><h2>Quem eu devo</h2><p class="section-description">Acompanhe valores que você precisa pagar a outras pessoas ou empresas.</p></div><button class="button button-secondary" id="open-debt"><span aria-hidden="true">＋</span> Nova dívida</button></div>
+        <div class="debt-summary"><div><span class="muted-label">Total em aberto</span><strong id="debts-total">R$ 0,00</strong></div><span id="debts-count">Nenhuma dívida em aberto</span></div>
+        <div class="debts-list" id="debts-list"></div><div class="empty-inline" id="debts-empty">Nenhuma dívida cadastrada. Adicione alguém ou uma empresa para acompanhar o que falta pagar.</div>
+      </section>
       <footer class="page-footer">Feito para trazer mais tranquilidade ao seu dia a dia <span>✦</span></footer>
     </main>
   </div>
@@ -75,6 +80,13 @@
     <label class="field-label" for="bill-name">Nome da conta</label><input class="text-input" id="bill-name" name="name" type="text" maxlength="60" placeholder="Ex.: Internet" required>
     <div class="form-row"><div class="field"><label class="field-label" for="bill-amount">Valor mensal</label><div class="amount-input compact"><span>R$</span><input id="bill-amount" name="amount" type="number" min="0.01" step="0.01" placeholder="0,00" required inputmode="decimal"></div></div><div class="field"><label class="field-label" for="bill-due-day">Dia de vencimento</label><input class="text-input" id="bill-due-day" name="dueDay" type="number" min="1" max="31" placeholder="Ex.: 10" required inputmode="numeric"></div></div>
     <div class="dialog-actions"><button class="button button-secondary" type="button" data-close="bill-dialog">Cancelar</button><button class="button button-primary" type="submit">Salvar conta</button></div>
+  </form></dialog>
+  <dialog class="form-dialog" id="debt-dialog" aria-labelledby="debt-dialog-title"><form id="debt-form" class="dialog-form"><div class="dialog-heading"><div><div class="section-kicker">NOVA DÍVIDA</div><h2 id="debt-dialog-title">Adicionar dívida</h2></div><button class="icon-button" type="button" data-close="debt-dialog" aria-label="Fechar">×</button></div>
+    <label class="field-label" for="debt-creditor">Para quem você deve?</label><input class="text-input" id="debt-creditor" name="creditor" type="text" maxlength="80" placeholder="Pessoa ou empresa" required>
+    <label class="field-label" for="debt-amount">Valor</label><div class="amount-input"><span>R$</span><input id="debt-amount" name="amount" type="number" min="0.01" step="0.01" placeholder="0,00" required inputmode="decimal"></div>
+    <label class="field-label" for="debt-due-date">Data de vencimento</label><input class="text-input" id="debt-due-date" name="dueDate" type="date" required>
+    <label class="field-label" for="debt-note">Observação <span class="optional-label">(opcional)</span></label><input class="text-input" id="debt-note" name="note" type="text" maxlength="100" placeholder="Ex.: parcela do empréstimo">
+    <div class="dialog-actions"><button class="button button-secondary" type="button" data-close="debt-dialog">Cancelar</button><button class="button button-primary" type="submit">Salvar dívida</button></div>
   </form></dialog>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 </body>
