@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f5f7fb">
+  <title>Meu Bolso — Controle financeiro</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" aria-label="Navegação principal">
+      <a class="brand" href="#inicio" aria-label="Meu Bolso, início"><span class="brand-mark">M</span><span>meu<span class="brand-light">bolso</span></span></a>
+      <div class="side-caption">MENU</div>
+      <nav class="side-nav">
+        <a class="nav-link active" href="#inicio"><span class="nav-icon">▦</span> Visão geral</a>
+        <a class="nav-link" href="#transacoes"><span class="nav-icon">↕</span> Transações</a>
+        <a class="nav-link" href="#contas-fixas"><span class="nav-icon">◷</span> Contas fixas</a>
+      </nav>
+      <div class="sidebar-note"><span class="note-icon">✦</span><strong>Um passo de cada vez.</strong><p>Pequenas escolhas hoje fazem diferença amanhã.</p></div>
+      <div class="sidebar-footer"><span class="status-dot"></span> Seus dados ficam só neste dispositivo</div>
+    </aside>
+
+    <main id="inicio" class="main-content">
+      <header class="topbar">
+        <div class="mobile-brand"><span class="brand-mark">M</span> meu<span class="brand-light">bolso</span></div>
+        <div class="topbar-date"><span class="calendar-icon">▦</span><span id="today-label"></span></div>
+        <button class="button button-primary top-add" id="open-transaction"><span aria-hidden="true">＋</span> Nova transação</button>
+      </header>
+
+      <section class="welcome-row">
+        <div><div class="eyebrow">SEU RESUMO FINANCEIRO</div><h1>Visão geral</h1><p class="subheading" id="month-label">Acompanhe seu dinheiro com clareza.</p></div>
+        <button class="button button-primary welcome-add" id="open-transaction-mobile"><span aria-hidden="true">＋</span> Nova transação</button>
+      </section>
+
+      <section class="summary-grid" aria-label="Resumo financeiro">
+        <article class="summary-card balance-card"><div class="card-top"><span>Saldo atual</span><span class="card-icon green-icon">↗</span></div><div class="card-value" id="balance-value">R$ 0,00</div><div class="card-foot"><span class="tiny-dot green-dot"></span> Receitas menos despesas</div></article>
+        <article class="summary-card"><div class="card-top"><span>Receitas do mês</span><span class="card-icon green-icon">＋</span></div><div class="card-value green-text" id="income-value">R$ 0,00</div><div class="card-foot">Entradas neste mês</div></article>
+        <article class="summary-card"><div class="card-top"><span>Despesas do mês</span><span class="card-icon red-icon">−</span></div><div class="card-value red-text" id="expense-value">R$ 0,00</div><div class="card-foot">Saídas neste mês</div></article>
+        <article class="summary-card target-card"><div class="card-top"><span>Para fechar o mês</span><span class="card-icon blue-icon">◎</span></div><div class="card-value" id="target-value">R$ 0,00</div><div class="card-foot" id="target-caption">Valor que falta para cobrir contas e margem</div></article>
+      </section>
+
+      <section class="insight-grid">
+        <article class="panel budget-panel"><div class="panel-heading"><div><div class="section-kicker">VISÃO DO MÊS</div><h2>Ritmo do orçamento</h2></div><span class="month-chip" id="budget-month"></span></div>
+          <div class="budget-numbers"><div><span class="muted-label">Despesas registradas</span><strong id="budget-spent">R$ 0,00</strong></div><div class="budget-right"><span class="muted-label">Receitas do mês</span><strong id="budget-income">R$ 0,00</strong></div></div>
+          <div class="progress-track" role="progressbar" aria-label="Despesas em relação às receitas do mês" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div class="progress-fill" id="budget-progress"></div></div>
+          <div class="progress-caption"><span id="budget-caption">Adicione receitas e despesas para acompanhar seu orçamento.</span><strong id="budget-percent">0%</strong></div>
+        </article>
+        <article class="panel fixed-summary"><div class="panel-heading"><div><div class="section-kicker">PLANEJAMENTO</div><h2>Contas fixas</h2></div><span class="card-icon blue-icon">◷</span></div><div class="fixed-total" id="fixed-total">R$ 0,00</div><div class="fixed-summary-foot"><span id="fixed-count">Nenhuma conta cadastrada</span><a href="#contas-fixas">Ver contas <span aria-hidden="true">→</span></a></div><div class="safety-row"><label for="safety-margin">Margem de segurança</label><div class="currency-input"><span>R$</span><input id="safety-margin" type="number" min="0" step="0.01" inputmode="decimal" aria-label="Margem de segurança"></div></div></article>
+      </section>
+
+      <section class="panel transactions-panel" id="transacoes"><div class="panel-heading transactions-heading"><div><div class="section-kicker">MOVIMENTAÇÕES</div><h2>Transações do mês</h2></div><label class="filter-wrap"><span class="sr-only">Filtrar por categoria</span><select id="category-filter" aria-label="Filtrar por categoria"><option value="all">Todas as categorias</option></select></label></div>
+        <div class="transaction-list" id="transaction-list"></div><div class="empty-state" id="transaction-empty"><span class="empty-icon">↕</span><strong>Nenhuma transação por aqui</strong><p>Adicione uma receita ou despesa para começar.</p><button class="text-button" id="empty-add">＋ Adicionar transação</button></div>
+        <div class="panel-bottom"><span id="transaction-count">0 transações</span><span>Exibindo apenas o mês atual</span></div>
+      </section>
+
+      <section class="panel bills-panel" id="contas-fixas"><div class="panel-heading"><div><div class="section-kicker">DESPESAS RECORRENTES</div><h2>Contas fixas</h2><p class="section-description">Organize os compromissos que se repetem todo mês.</p></div><button class="button button-secondary" id="open-bill"><span aria-hidden="true">＋</span> Nova conta</button></div>
+        <div class="bills-list" id="bills-list"></div><div class="empty-inline" id="bills-empty">Nenhuma conta fixa cadastrada. Adicione aluguel, internet ou outras despesas recorrentes.</div>
+      </section>
+      <footer class="page-footer">Feito para trazer mais tranquilidade ao seu dia a dia <span>✦</span></footer>
+    </main>
+  </div>
+
+  <dialog class="form-dialog" id="transaction-dialog" aria-labelledby="transaction-dialog-title"><form id="transaction-form" class="dialog-form">
+    <div class="dialog-heading"><div><div class="section-kicker">NOVA MOVIMENTAÇÃO</div><h2 id="transaction-dialog-title">Adicionar transação</h2></div><button class="icon-button" type="button" data-close="transaction-dialog" aria-label="Fechar">×</button></div>
+    <div class="type-switch" role="group" aria-label="Tipo de transação"><button type="button" class="type-button active" data-type="expense">Despesa</button><button type="button" class="type-button" data-type="income">Receita</button></div><input type="hidden" id="transaction-type" value="expense">
+    <label class="field-label" for="transaction-amount">Valor</label><div class="amount-input"><span>R$</span><input id="transaction-amount" name="amount" type="number" min="0.01" step="0.01" placeholder="0,00" required inputmode="decimal"></div>
+    <label class="field-label" for="transaction-description">Descrição</label><input class="text-input" id="transaction-description" name="description" type="text" maxlength="80" placeholder="Ex.: Mercado da semana" required>
+    <div class="form-row"><div class="field"><label class="field-label" for="transaction-category">Categoria</label><select class="text-input" id="transaction-category" name="category" required></select><input class="text-input custom-category hidden" id="new-category" type="text" maxlength="30" placeholder="Nome da nova categoria" aria-label="Nome da nova categoria"></div><div class="field"><label class="field-label" for="transaction-date">Data</label><input class="text-input" id="transaction-date" name="date" type="date" required></div></div>
+    <div class="dialog-actions"><button class="button button-secondary" type="button" data-close="transaction-dialog">Cancelar</button><button class="button button-primary" type="submit">Salvar transação</button></div>
+  </form></dialog>
+
+  <dialog class="form-dialog" id="bill-dialog" aria-labelledby="bill-dialog-title"><form id="bill-form" class="dialog-form"><div class="dialog-heading"><div><div class="section-kicker">DESPESA RECORRENTE</div><h2 id="bill-dialog-title">Adicionar conta fixa</h2></div><button class="icon-button" type="button" data-close="bill-dialog" aria-label="Fechar">×</button></div>
+    <label class="field-label" for="bill-name">Nome da conta</label><input class="text-input" id="bill-name" name="name" type="text" maxlength="60" placeholder="Ex.: Internet" required>
+    <div class="form-row"><div class="field"><label class="field-label" for="bill-amount">Valor mensal</label><div class="amount-input compact"><span>R$</span><input id="bill-amount" name="amount" type="number" min="0.01" step="0.01" placeholder="0,00" required inputmode="decimal"></div></div><div class="field"><label class="field-label" for="bill-due-day">Dia de vencimento</label><input class="text-input" id="bill-due-day" name="dueDay" type="number" min="1" max="31" placeholder="Ex.: 10" required inputmode="numeric"></div></div>
+    <div class="dialog-actions"><button class="button button-secondary" type="button" data-close="bill-dialog">Cancelar</button><button class="button button-primary" type="submit">Salvar conta</button></div>
+  </form></dialog>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>
