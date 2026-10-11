@@ -19,12 +19,13 @@
       return {
         transactions: Array.isArray(saved.transactions) ? saved.transactions : [],
         bills: Array.isArray(saved.bills) ? saved.bills : [],
+        debts: Array.isArray(saved.debts) ? saved.debts : [],
         categories: [...new Set([...DEFAULT_CATEGORIES, ...(Array.isArray(saved.categories) ? saved.categories : [])])],
         safetyMargin: Number.isFinite(Number(saved.safetyMargin)) ? Math.max(0, Number(saved.safetyMargin)) : 300
       };
     } catch (error) {
       console.warn('Não foi possível ler os dados salvos.', error);
-      return { transactions: [], bills: [], categories: [...DEFAULT_CATEGORIES], safetyMargin: 300 };
+      return { transactions: [], bills: [], debts: [], categories: [...DEFAULT_CATEGORIES], safetyMargin: 300 };
     }
   }
 
@@ -77,6 +78,7 @@
     renderCategoryOptions();
     renderTransactions(transactionsThisMonth);
     renderBills();
+    renderDebts();
   }
 
   function renderCategoryOptions() {
@@ -108,6 +110,19 @@
     $('#bills-empty').style.display = data.bills.length ? 'none' : 'block';
   }
 
+  function renderDebts() {
+    const openDebts = data.debts.filter((debt) => !debt.paid);
+    const total = openDebts.reduce((sum, debt) => sum + Number(debt.amount || 0), 0);
+    $('#debts-total').textContent = money.format(total);
+    $('#debts-count').textContent = `${openDebts.length} ${openDebts.length === 1 ? 'dívida em aberto' : 'dívidas em aberto'}`;
+    const ordered = data.debts.slice().sort((a, b) => Number(Boolean(a.paid)) - Number(Boolean(b.paid)) || String(a.dueDate).localeCompare(String(b.dueDate)));
+    $('#debts-list').innerHTML = ordered.map((debt) => {
+      const dueDate = debt.dueDate ? dateFormatter.format(new Date(`${debt.dueDate}T12:00:00`)) : 'Sem vencimento';
+      return `<article class="debt-row ${debt.paid ? 'debt-paid' : ''}"><div class="debt-person"><span class="debt-symbol" aria-hidden="true">↗</span><div class="debt-person-copy"><strong>${escapeHTML(debt.creditor)}</strong><span>${escapeHTML(debt.note || 'Dívida pessoal')}</span></div></div><span class="debt-due">Vence ${escapeHTML(dueDate)}</span><span class="debt-amount">${money.format(Number(debt.amount))}</span><span class="debt-status ${debt.paid ? 'paid' : 'open'}">${debt.paid ? 'Paga' : 'Em aberto'}</span><button class="debt-action" type="button" data-toggle-debt="${escapeHTML(debt.id)}" aria-label="${debt.paid ? 'Reabrir' : 'Marcar como paga'}: ${escapeHTML(debt.creditor)}">${debt.paid ? 'Reabrir' : 'Marcar paga'}</button><button class="delete-button" type="button" data-delete-debt="${escapeHTML(debt.id)}" aria-label="Excluir dívida de ${escapeHTML(debt.creditor)}">×</button></article>`;
+    }).join('');
+    $('#debts-empty').style.display = data.debts.length ? 'none' : 'block';
+  }
+
   let toastTimer;
   function showToast(message) {
     const toast = $('#toast');
@@ -123,6 +138,7 @@
   $('#open-transaction-mobile').addEventListener('click', () => openDialog('#transaction-dialog'));
   $('#empty-add').addEventListener('click', () => openDialog('#transaction-dialog'));
   $('#open-bill').addEventListener('click', () => openDialog('#bill-dialog'));
+  $('#open-debt').addEventListener('click', () => openDialog('#debt-dialog'));
   document.querySelectorAll('[data-close]').forEach((button) => button.addEventListener('click', () => closeDialog(`#${button.dataset.close}`)));
   document.querySelectorAll('dialog').forEach((dialog) => dialog.addEventListener('click', (event) => { if (event.target === dialog) dialog.close(); }));
 
@@ -163,6 +179,22 @@
     saveData(); render(); event.currentTarget.reset(); closeDialog('#bill-dialog'); showToast('Conta fixa adicionada.');
   });
 
+  $('#debt-form').addEventListener('submit', (event) => {
+    event.preventDefault();
+    const amount = Number($('#debt-amount').value);
+    if (!Number.isFinite(amount) || amount <= 0) return;
+    data.debts.push({
+      id: crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random()}`,
+      creditor: $('#debt-creditor').value.trim(),
+      amount,
+      dueDate: $('#debt-due-date').value,
+      note: $('#debt-note').value.trim(),
+      paid: false,
+      createdAt: Date.now()
+    });
+    saveData(); render(); event.currentTarget.reset(); closeDialog('#debt-dialog'); showToast('Dívida adicionada.');
+  });
+
   $('#safety-margin').addEventListener('change', (event) => {
     data.safetyMargin = Math.max(0, Number(event.target.value) || 0);
     saveData(); render(); showToast('Margem de segurança atualizada.');
@@ -171,6 +203,8 @@
   document.addEventListener('click', (event) => {
     const transactionButton = event.target.closest('[data-delete-transaction]');
     const billButton = event.target.closest('[data-delete-bill]');
+    const debtToggleButton = event.target.closest('[data-toggle-debt]');
+    const debtDeleteButton = event.target.closest('[data-delete-debt]');
     if (transactionButton) {
       data.transactions = data.transactions.filter((item) => item.id !== transactionButton.dataset.deleteTransaction);
       saveData(); render(); showToast('Transação excluída.');
@@ -179,8 +213,17 @@
       data.bills = data.bills.filter((item) => item.id !== billButton.dataset.deleteBill);
       saveData(); render(); showToast('Conta fixa excluída.');
     }
+    if (debtToggleButton) {
+      const debt = data.debts.find((item) => item.id === debtToggleButton.dataset.toggleDebt);
+      if (debt) { debt.paid = !debt.paid; saveData(); render(); showToast(debt.paid ? 'Dívida marcada como paga.' : 'Dívida reaberta.'); }
+    }
+    if (debtDeleteButton) {
+      data.debts = data.debts.filter((item) => item.id !== debtDeleteButton.dataset.deleteDebt);
+      saveData(); render(); showToast('Dívida excluída.');
+    }
   });
 
   $('#transaction-date').value = localDate(today);
+  $('#debt-due-date').value = localDate(today);
   render();
 })();
